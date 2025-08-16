@@ -1,0 +1,33 @@
+# Steps to Create a Local Repository in CentOS
+
+1. Create a directory for the repository:
+   mkdir /localrepo
+
+2. Mount the CentOS DVD or ISO:
+   mount /dev/cdrom /mnt   # or use the ISO file path
+
+3. Copy all files from the DVD/ISO to the local repo folder:
+   cp -r /mnt/* /localrepo/
+
+4. Remove all existing online repo files:
+   rm -f /etc/yum.repos.d/*
+
+5. Create a new repo file:
+   nano /etc/yum.repos.d/local.repo
+
+   # Paste the following:
+   [centos-local]
+   name=CentOS Local Repo
+   baseurl=file:///localrepo/
+   enabled=1
+   gpgcheck=0
+
+6. (Optional) If you add/remove packages, regenerate metadata:
+   createrepo_c /localrepo/
+
+7. Clean and check the repo:
+   dnf clean all
+   dnf repolist
+
+8. Install packages offline:
+   dnf install <package-name>

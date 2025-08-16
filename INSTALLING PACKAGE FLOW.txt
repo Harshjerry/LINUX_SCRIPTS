@@ -1,0 +1,80 @@
+dnf install httpd
+I’ll break it into the step-by-step flow so you know when it reads local config and when it fetches from the internet.
+
+1️⃣ You run the command
+dnf (Dandified YUM) starts up.
+
+It parses your command: install → means “install this package and any dependencies.”
+
+It records the target package name: httpd.
+
+2️⃣ Reads config files
+Before touching the internet, DNF always checks local configuration files:
+
+/etc/dnf/dnf.conf → global DNF settings (e.g., cache dir, fastest mirror, GPG checks).
+
+/etc/yum.repos.d/*.repo → list of repository definitions.
+
+Each .repo file has:
+
+name → human name of repo
+
+baseurl or mirrorlist → where to download packages
+
+enabled flag
+
+gpgcheck and key location
+
+✅ At this stage, no download yet — it’s just figuring out where to look.
+
+3️⃣ Checks local cache
+DNF checks its metadata cache (in /var/cache/dnf/) to see if it already knows what packages and versions are available.
+
+If cache is fresh (based on metadata_expire in repo file), it uses it.
+
+If cache is expired or missing, it downloads repo metadata from the URLs in .repo files.
+
+🔹 Repo metadata contains the list of packages, dependencies, and file locations — not the actual package yet.
+
+4️⃣ Resolves dependencies
+Using the metadata, DNF figures out:
+
+Which package provides httpd.
+
+All required dependencies (e.g., apr, apr-util, httpd-tools).
+
+If dependencies aren’t already installed, they are added to the install list.
+
+5️⃣ Downloads packages from the internet
+Once it knows the exact .rpm files it needs, DNF:
+
+Connects to the repo servers from the .repo config.
+
+Downloads each .rpm into the cache directory.
+
+6️⃣ GPG verification
+Before installing, DNF verifies each downloaded RPM against its GPG key (key location is in .repo file).
+
+If keys aren’t installed, DNF prompts to import them.
+
+7️⃣ Installs packages
+Uses rpm internally to install the .rpm files.
+
+Updates the RPM database (/var/lib/rpm).
+
+Registers files with the system.
+
+8️⃣ Post-install scripts
+Runs any post-install scripts included in the RPM (e.g., create config dirs, systemd unit files).
+
+In case of httpd, it will:
+
+Place Apache config files in /etc/httpd/
+
+Create systemd service unit httpd.service
+
+
+
+
+
+Command → Read dnf.conf & .repo → Check cache → (If needed) Download metadata → Resolve deps → Download RPMs → Verify GPG → Install → Post-install scripts
