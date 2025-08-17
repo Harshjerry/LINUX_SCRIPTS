@@ -1,0 +1,65 @@
+📧 Postfix + s-nail Setup on CentOS
+
+This guide explains how to set up Postfix (mail transfer agent) and s-nail (mail client) on a CentOS machine for local mail delivery.
+
+1. Install Packages
+sudo yum install -y postfix s-nail
+
+2. Enable and Start Postfix
+sudo systemctl enable postfix
+sudo systemctl start postfix
+sudo systemctl status postfix
+
+3. Configure Postfix
+
+Edit /etc/postfix/main.cf:
+
+sudo nano /etc/postfix/main.cf
+
+
+Update/add the following:
+
+myhostname = mail.localdomain
+mydomain = localdomain
+myorigin = $mydomain
+inet_interfaces = all
+inet_protocols = ipv4
+mydestination = $myhostname, localhost.$mydomain, localhost, $mydomain
+relayhost =
+mynetworks = 127.0.0.0/8
+home_mailbox = Maildir/
+
+4. Create Maildir
+mkdir -p ~/Maildir/{cur,new,tmp}
+chmod -R 700 ~/Maildir
+
+5. Restart Postfix
+sudo systemctl restart postfix
+
+6. Configure s-nail
+
+Edit ~/.mailrc:
+
+nano ~/.mailrc
+
+
+Add:
+
+set sendmail=/usr/sbin/sendmail
+set from=root@localdomain
+set realname="Local Root"
+set mbox=+Inbox
+set record=+Sent
+
+7. Send Test Mail
+echo "This is a test mail" | mail -s "Test Subject" root
+
+8. Check Mail
+mail
+
+
+Inside the mail client:
+
+Press Enter to read messages
+
+Type q to quit
