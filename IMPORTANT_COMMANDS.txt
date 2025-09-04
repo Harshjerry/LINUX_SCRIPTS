@@ -1,0 +1,7 @@
+TO SEE PUBLIC IP OF MACHINE
+$ curl ifconfig.me
+
+TO COPY FILE FROM DESKTOP TO  EC2 
+$ scp -i devops-demo.pem  jerry.png  ec2-user@54.162.3.59:/home/ec2-user/
+
+
