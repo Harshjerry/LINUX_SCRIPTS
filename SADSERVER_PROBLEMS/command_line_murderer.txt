@@ -1,0 +1,15 @@
+grep -A 5 "L337" vehicles | grep -A 5 "Honda" | grep -A 5 "Blue" | grep "Owner:" | awk -F': ' '{print $2}'
+
+cat fileA fileB fileC fileD fileE | grep "Erika Owens" | wc -l
+
+
+
+# we can cat multiple files and then grep for a word in those lines
+
+Description: This is the Command Line Murders with a small twist as in the solution is different
+Enter the name of the murderer in the file /home/admin/mysolution, for example echo "John Smith" > ~/mysolution
+Hints are at the base of the /home/admin/clmystery directory. Enjoy the investigation!
+Root (sudo) Access: False
+Test: md5sum ~/mysolution returns 9bba101c7369f49ca890ea96aa242dd5
+(You can always see /home/admin/agent/check.sh to see how the solution is evaluated).
+Time to Solve: 20 minutes.

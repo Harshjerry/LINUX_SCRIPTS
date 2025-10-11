@@ -1,0 +1,12 @@
+awk '{print $1}' /home/admin/access.log | sort | uniq -c | sort -nr | head -1 | awk '{print $2}' > /home/admin/highestip.txt
+ or
+awk '{print $1}' access.log | sort | uniq -c | sort -nr | head -1
+
+
+awk '{print $1}' /home/admin/access.log → Extract the first column (IP).
+sort → Sort the IPs so that duplicates are consecutive.
+uniq -c → Count occurrences of each IP.
+sort -nr → Sort by frequency, descending.
+head -1 → Take the IP with the highest count.
+awk '{print $2}' → Extract only the IP (without the count).
+> /home/admin/highestip.txt → Save the result to the required file.
