@@ -1,0 +1,17 @@
+#!/bin/bash
+sum=0
+while read -r col1 col2; do
+    sum=$(echo "$sum+$col2" | bc)
+done < scores.txt
+
+# Divide sum by 100 using bc
+ans=$(echo "$sum/100" | bc -l)
+
+echo $ans
+
+
+ we wee given  file with texts  like
+ 1 1.5 
+ 2  6.55
+ 3   8.89
+ 4    9.0
