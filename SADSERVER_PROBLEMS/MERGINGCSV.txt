@@ -1,6 +1,9 @@
 
 cat polldayregistrations_*.csv | awk 'FNR==1 && NR!=1 {next} {print}' > all.csv
 
+File1 has 3 lines, File2 has 2 lines → NR goes 1,2,
+FNR read in the current file only
+File1 has 3 lines → FNR = 1,2,3; File2 starts → FNR resets to 1,2,
 
 Scenario: "Saint Paul": Merge Many CSVs files
 Description: Join (merge) all the 338 files in /home/admin/polldayregistrations_enregistjourduscrutin?????.csv into 
