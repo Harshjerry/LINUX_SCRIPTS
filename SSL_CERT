@@ -1,0 +1,60 @@
+1️⃣ Create a CA (Certificate Authority)
+# Generate CA private key
+openssl genrsa -out ca.key 2048
+# Create a self-signed CA certificate (valid for 10 years)
+openssl req -x509 -new -key ca.key -sha256 -days 3650 -subj "/CN=MyRootCA" -out ca.crt
+
+2️⃣ Create a Server Key and CSR
+openssl genrsa -out server.key 2048
+openssl req -new -key server.key -subj "/CN=server.mydomain.com" -out server.csr
+
+3️⃣ Sign the Server CSR with your CA
+openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key \
+-CAcreateserial -out server.crt -days 365 -sha256
+
+4️⃣ Verify
+openssl verify -CAfile ca.crt server.crt
+
+
+
+#Edit the SSL config file:
+sudo vim /etc/nginx/conf.d/ssl.conf
+
+# //yaml format kinda
+# server {
+#     listen 443 ssl;
+#     server_name server.local;
+
+#     ssl_certificate     /etc/nginx/ssl/server.crt;
+#     ssl_certificate_key /etc/nginx/ssl/server.key;
+
+#     location / {
+#         root /usr/share/nginx/html;
+#         index index.html;
+#     }
+# }
+
+# # Redirect HTTP to HTTPS
+# server {
+#     listen 80;
+#     server_name server.local;
+#     return 301 https://$host$request_uri;
+# }
+
+# Test and Reload Nginx
+sudo nginx -t
+sudo systemctl reload nginx
+
+
+
+Flow in simple steps (like a flowchart)
+
+Create CA → ca.key + ca.crt (self-signed)
+Create Server Key + CSR → server.key + server.csr
+Sign Server CSR → openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -out server.crt
+Configure Nginx → Use server.crt + server.key
+Client connects via HTTPS
+Browser receives server.crt
+Browser verifies signature using ca.crt
+If valid, TLS handshake happens
+Encrypted communication starts
