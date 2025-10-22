@@ -1,0 +1,13 @@
+🧩 1️⃣ HTTP Error Codes (Client sees these)
+
+Code	     Meaning	                                Reason in Nginx/http server
+
+200 OK	 Everything worked	                       Nginx found the file and served it
+301/302  Redirect	Page moved	                  You added a return 301 or rewrite
+400      Bad Request	                           Client sent invalid request malformed headers or bad URL
+403      Forbidden	Permission issue	            file exists but user www-data can’t read it
+404      Not Found	File doesn’t exist	            path wrong or missing index.html
+500      Internal Server Error                    	Generic server failure	upstream (PHP-FPM) or Nginx internal error
+502      Bad Gateway	                            Gateway to backend failed PHP-FPM or proxy backend down
+503      Service Unavailable	                     Service overloaded  rate-limit or limit_conn triggered
+504       Gateway Timeout	                       Backend didn’t respond in time	PHP or upstream timeout
