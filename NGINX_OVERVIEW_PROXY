@@ -1,0 +1,84 @@
+# Nginx Multi-Site Setup Example
+
+This is a practical example showing how to serve **three sites** with a single Nginx server using `sites-available` and `sites-enabled`.
+
+---
+
+## 1. Sites Overview
+
+| Site  | Domain       | Backend                         |
+|-------|-------------|---------------------------------|
+| site1 | site1.local | Flask app via Gunicorn (`/run/gunicorn1.sock`) |
+| site2 | site2.local | Static HTML (`/var/www/site2`) |
+| site3 | site3.local | Node.js app on port 5000       |
+
+---
+
+## 2. Config Files in `/etc/nginx/sites-available/`
+
+### site1 (`/etc/nginx/sites-available/site1`)
+```nginx
+server {
+    listen 80;
+    server_name site1.local;
+
+    location / {
+        proxy_pass http://unix:/run/gunicorn1.sock;
+        include proxy_params;
+    }
+} 
+
+## site 2
+server {
+    listen 80;
+    server_name site2.local;
+
+    root /var/www/site2;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+
+##site 3 conf
+server {
+    listen 8080;
+    server_name site3.local;
+
+    location / {
+        proxy_pass http://127.0.0.1:5000;
+        include proxy_params;
+    }
+}
+
+
+3. Enable the Sites
+cd /etc/nginx/sites-enabled
+sudo ln -s /etc/nginx/sites-available/site1 .
+sudo ln -s /etc/nginx/sites-available/site2 .
+sudo ln -s /etc/nginx/sites-available/site3 .
+
+
+Check sites-enabled:
+
+$ls -l
+
+Expected output:
+
+site1 -> /etc/nginx/sites-available/site1
+site2 -> /etc/nginx/sites-available/site2
+site3 -> /etc/nginx/sites-available/site3
+
+4. Test and Reload Nginx
+sudo nginx -t        # Test Nginx config
+sudo systemctl reload nginx
+
+
+✅ Nginx is now ready to serve all three sites.
+
+5. How Requests Are Served
+Request	What Happens
+curl http://site1.local	Nginx uses server_name site1.local and proxies to Gunicorn socket /run/gunicorn1.sock
+curl http://site2.local	Nginx uses server_name site2.local and serves static files from /var/www/site2
+curl http://site3.local:8080	Nginx proxies to Node.js app at port 5000
