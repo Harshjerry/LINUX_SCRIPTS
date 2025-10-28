@@ -1,0 +1,116 @@
+Granting User Access to a Kubernetes Cluster (Manual CSR + Kubeconfig Method)
+📍 Overview
+
+This document describes how to securely create and grant access to a new Kubernetes user using client certificates, CSR signing, and RBAC permissions.
+We’ll create a user harsh and provide them with a custom kubeconfig (harsh.kubeconfig) for cluster access.
+
+🧰 Prerequisites
+
+Access to control plane (admin kubeconfig)
+
+openssl and kubectl installed
+
+Sudo privileges (if needed)
+
+⚙️ Step 1 — Create Private Key and CSR for the User
+USER=harsh
+openssl genrsa -out ${USER}.key 2048
+openssl req -new -key ${USER}.key -out ${USER}.csr -subj "/CN=${USER}/O=dev"
+
+
+CN → Common Name (the username)
+
+O → Organization (optional, used for grouping via RBAC)
+
+🧾 Step 2 — Create Kubernetes CSR Manifest
+cat <<EOF > ${USER}-csr.yaml
+apiVersion: certificates.k8s.io/v1
+kind: CertificateSigningRequest
+metadata:
+  name: ${USER}-csr
+spec:
+  request: $(cat ${USER}.csr | base64 | tr -d '\n')
+  signerName: kubernetes.io/kube-apiserver-client
+  usages:
+  - client auth
+EOF
+
+🚀 Step 3 — Submit and Approve the CSR
+kubectl apply -f ${USER}-csr.yaml
+kubectl get csr
+kubectl certificate approve ${USER}-csr
+
+
+Retrieve the signed certificate:
+
+kubectl get csr ${USER}-csr -o jsonpath='{.status.certificate}' | base64 --decode > ${USER}.crt
+
+
+You now have:
+
+${USER}.key → private key
+
+${USER}.crt → signed certificate
+
+🔑 Step 4 — Extract Cluster CA and API Server Info
+kubectl config view --raw -o jsonpath='{.clusters[0].cluster.certificate-authority-data}' | base64 --decode > ca.crt
+API_SERVER=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
+CLUSTER_NAME=$(kubectl config view --minify -o jsonpath='{.clusters[0].name}')
+
+🧩 Step 5 — Create Custom Kubeconfig for the User
+cat <<EOF > ${USER}.kubeconfig
+apiVersion: v1
+kind: Config
+clusters:
+- name: ${CLUSTER_NAME}
+  cluster:
+    certificate-authority-data: $(base64 -w 0 ca.crt)
+    server: ${API_SERVER}
+
+users:
+- name: ${USER}
+  user:
+    client-certificate-data: $(base64 -w 0 ${USER}.crt)
+    client-key-data: $(base64 -w 0 ${USER}.key)
+
+contexts:
+- name: ${USER}-context
+  context:
+    cluster: ${CLUSTER_NAME}
+    user: ${USER}
+    namespace: default
+
+current-context: ${USER}-context
+EOF
+
+🔒 Step 6 — Assign RBAC Permissions
+Example: Cluster-admin access
+kubectl create clusterrolebinding ${USER}-admin \
+  --clusterrole=cluster-admin \
+  --user=${USER}
+
+Example: Read-only access
+kubectl create rolebinding ${USER}-readonly \
+  --clusterrole=view \
+  --user=${USER} \
+  --namespace=default
+
+🌐 Step 7 — Verify Access
+KUBECONFIG=${USER}.kubeconfig kubectl get pods
+KUBECONFIG=${USER}.kubeconfig kubectl auth can-i create pods
+
+💻 Step 8 — Share Access with Remote User
+
+Send only ${USER}.kubeconfig to the user (securely).
+
+Ensure API server IP (https://<ip>:6443) is reachable from their machine.
+
+They can test:
+
+KUBECONFIG=harsh.kubeconfig kubectl get pods
+
+🧠 Notes
+File	Description	Shareable
+ca.crt	Cluster CA public cert	✅ Yes
+ca.key	CA private key	❌ No
+harsh.crt	User’s signed cert	✅ Yes
