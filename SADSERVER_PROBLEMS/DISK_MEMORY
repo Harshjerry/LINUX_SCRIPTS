@@ -1,0 +1,142 @@
+
+A partition (like /dev/nvme1n1p1) is a section of a physical disk — it’s basically a “slice” of the disk that can hold a filesystem (like ext4, xfs, etc).
+
+When you mount a partition, you are telling Linux:
+“From now on, this directory will show the contents of that filesystem (partition).”
+
+🧩 What is LVM?
+
+LVM (Logical Volume Manager) provides a flexible way to manage disk storage in Linux.
+Instead of dealing with fixed partitions, LVM lets you:
+Combine multiple disks/partitions into one logical volume.
+Resize storage (increase or shrink) without reformatting or downtime.
+Create snapshots for backup.
+
+| Term           | Full Form       | Description                                                                                 |
+| -------------- | --------------- | ------------------------------------------------------------------------------------------- |
+| **PV**         | Physical Volume | A physical disk or partition prepared for LVM use (e.g. `/dev/sdb`, `/dev/nvme1n1`)         |
+| **VG**         | Volume Group    | A pool of storage created by combining multiple PVs                                         |
+| **LV**         | Logical Volume  | A “virtual partition” carved out from a VG — this is where you create filesystems and mount |
+| **Filesystem** | —               | A format (ext4, xfs, etc.) created on the LV for data storage                               |
+
+🧭 LVM Architecture
+[ Physical Disks ]
+     ↓
+[ Physical Volumes (PVs) ]
+     ↓
+[ Volume Group (VG) ]
+     ↓
+[ Logical Volumes (LVs) ]
+     ↓
+[ Filesystems and Mount Points ]
+
+example
+/dev/nvme1n1 + /dev/nvme2n1 → vg_data → lv_data → mounted at /mnt/data
+
+
+
+
+⚙️ Step-by-Step: Creating an LVM Setup
+🧩 Example setup
+
+Assume you have:
+
+/dev/nvme1n1  → 1 GB disk
+/dev/nvme2n1  → 1 GB disk
+
+Goal → Combine both into a single 2 GB logical volume mounted at /mnt/data.
+
+🧱 Step 1: Install LVM tools
+sudo apt update
+sudo apt install lvm2 -y
+
+🧭 Step 2: Create Physical Volumes (PVs)
+sudo pvcreate /dev/nvme1n1 /dev/nvme2n1
+
+
+Check:
+sudo pvs
+
+🧰 Step 3: Create a Volume Group (VG)
+sudo vgcreate vg_data /dev/nvme1n1 /dev/nvme2n1
+
+
+Check:
+sudo vgs
+
+📦 Step 4: Create a Logical Volume (LV)
+Use all free space from the VG:
+sudo lvcreate -n lv_data -l 100%FREE vg_data
+
+
+Check:
+sudo lvs
+🪶 Step 5: Create a Filesystem on LV
+sudo mkfs.ext4 /dev/vg_data/lv_data
+
+🗂 Step 6: Mount the Logical Volume
+sudo mkdir /mnt/data
+sudo mount /dev/vg_data/lv_data /mnt/data
+
+
+Check:
+
+df -h | grep data
+
+🧠 Step 7: Make Mount Persistent Across Reboot
+
+Get UUID:
+sudo blkid /dev/vg_data/lv_data
+
+
+Edit /etc/fstab:
+sudo nano /etc/fstab
+
+
+Add this line:
+
+/dev/vg_data/lv_data  /mnt/data  ext4  defaults  0  2
+
+
+Save and verify:
+
+sudo umount /mnt/data
+sudo mount -a
+df -h
+
+
+
+
+
+🚀 Extending an Existing LVM Volume
+
+Suppose you attach a new disk /dev/nvme3n1 (4 GB)
+and want to extend /mnt/data from 2 GB → 6 GB.
+
+🧱 Step 1: Create Physical Volume
+sudo pvcreate /dev/nvme3n1
+sudo pvs
+
+🧰 Step 2: Extend the Volume Group
+sudo vgextend vg_data /dev/nvme3n1
+sudo vgs
+
+📦 Step 3: Extend the Logical Volume
+
+Option A: Use all free space
+sudo lvextend -l +100%FREE /dev/vg_data/lv_data
+
+Option B: Add 2 GB specifically
+sudo lvextend -L +2G /dev/vg_data/lv_data
+
+
+Check:
+sudo lvs
+
+🧠 Step 4: Resize Filesystem to Use New Space
+For ext4:
+sudo resize2fs /dev/vg_data/lv_data
+
+Check:
+
+df -h /mnt/data

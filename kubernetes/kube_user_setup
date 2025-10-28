@@ -106,7 +106,7 @@ Send only ${USER}.kubeconfig to the user (securely).
 Ensure API server IP (https://<ip>:6443) is reachable from their machine.
 
 They can test:
-
+s
 KUBECONFIG=harsh.kubeconfig kubectl get pods
 
 🧠 Notes
