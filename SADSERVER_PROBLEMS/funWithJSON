@@ -1,0 +1,16 @@
+
+Scenario: "Unimak Island": Fun with Mr Jason
+
+Description: Using the file station_information.json ,
+ find the station_id where "has_kiosk" is false and "capacity" is greater than 30.
+
+Solution
+$ cat station_information.json |jq '.data.stations|map(select(.capacity>30 and .has_kiosk==false))'|jq '.[]|{station_id}'
+{
+  "station_id": "05c5e17c-7aa9-49b7-9da3-9db4858ec1fc"
+}
+
+refer notes on JQ (red copy) or
+https://youtu.be/m9dhrq9iRHA?si=pNLlRiOGhSWDP8Tt
+
+ 
