@@ -1,0 +1,8 @@
+
+
+Description: Given the CSV file /home/admin/table_tableau11.csv, find the Electoral District Name/Nom de circonscription that has the largest number of Rejected Ballots/Bulletins rejetés and 
+also has a population of less than 100,000.
+The initial CSV file may be corrupted or invalid in a way that can be fixed without changing its data.
+
+Solution:
+awk -F, 'NR>1 && $4<100000 {print $2, $9}' table_tableau11.csv | sort  -k2,2nr | head -1
