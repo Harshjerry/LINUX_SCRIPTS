@@ -1,0 +1,49 @@
+awk '{for(i=1;i<=NF;i++){ gsub(/[^a-zA-Z0-9]/,"",$i); word=toupper($i); if(length(word)>0) print word}}' frankestein.txt |sort|uniq -c|sort -k1,1n|tail -n 2
+
+
+
+Description: Find in the file frankestein.txt the second most frequent word and save in UPPER 
+(capital) case in the /home/admin/mysolution file.
+A word is a string of characters separated by space or
+ newlines or punctuation symbols .,:; . Disregard case ('The', 'the' and 'THE' is the same word) 
+ and for simplification consider the apostrophe as another character not as punctuation ("it's" would be a word, distinct from "it" and "is"). Also disregard
+ plurals ("car" and "cars" are different words) and other word variations (don't do "stemming").
+
+
+
+
+
+🧩 What gsub() Does
+
+gsub() stands for Global Substitution — it replaces all occurrences of a pattern in a string.
+
+📘 Syntax
+gsub(REGEX, REPLACEMENT, TARGET)
+
+Meaning
+| Parameter       | Description                                         |
+| --------------- | --------------------------------------------------- |
+| **REGEX**       | The pattern (regular expression) to search for      |
+| **REPLACEMENT** | The text to replace it with                         |
+| **TARGET**      | The variable or field in which substitution happens |
+
+✅ Example 1 — Remove commas
+echo "Harsh, Meta, Google" | awk '{ gsub(/,/, "", $0); print $0 }'
+Output:
+
+Harsh Meta Google
+
+✅ Example 2 — Remove punctuation from each word
+awk '{for(i=1;i<=NF;i++){ gsub(/[^a-zA-Z0-9]/, "", $i); print $i }}' text.txt
+Explanation:
+
+/[^a-zA-Z0-9]/ → means anything that is not a letter or number
+"" → removes such characters
+Result: Punctuation like . , / ! etc. are stripped from each word.
+
+
+✅ Example 3 — Replace spaces with underscores
+echo "Hello World From Harsh" | awk '{ gsub(/ /, "_"); print }'
+Output:
+
+Hello_World_From_Harsh
