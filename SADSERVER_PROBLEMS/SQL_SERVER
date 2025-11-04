@@ -1,0 +1,27 @@
+RESET ROOT PASSWORD OF  SQL  service 
+
+
+1. Stop the MySQL/MariaDB service first (Stopping the service ensures data consistency 
+and prevents any active sessions from interfering with the password reset process.)
+Use systemctl or service commands
+
+2. You can also export an environment variable like MYSQLD_OPTS="--skip-grant-tables" before starting the service, which tells the server to use that mode without editing the file permanently. This is handy if you want a one-off bypass without leaving it open.
+
+3. Once you’ve started MariaDB/MySQL with --skip-grant-tables, you can connect without a password using     $ mysql -u root
+
+4. $UPDATE mysql.user SET authentication_string=PASSWORD('newpassword') WHERE User='root';
+   $FLUSH PRIVILEGES;
+
+
+
+
+BACKUP AND RESTORING   DATABSE FROM BACKUP
+To restore a .sql backup file, you’ll use the MySQL command-line client to feed the file’s contents into the server.
+The basic syntax is:
+$ mysql -u root -p target_database < backup.sql
+
+Creating  backup  from db
+You use mysqldump to export a database’s structure and data into a .sql file.
+
+For example:
+mysqldump -u root -p source_database > backup.sql
