@@ -1,0 +1,30 @@
+https://earthly.dev/blog/jq-select/
+  this is best jq   article  , can be used  further  
+
+  EXAMPLES:
+  curl https://api.github.com/repos/stedolan/jq/issues?per_page=100 | \
+   jq 'map({ title: .title, number: .number, labels: .labels | length }) | 
+   map(select(.labels > 0))'
+[
+  {
+    "title": "Bump lxml from 4.3.1 to 4.6.3 in /docs",
+    "number": 2295,
+    "labels": 1
+  },
+  {
+    "title": "Bump pyyaml from 3.13 to 5.4 in /docs",
+    "number": 2291,
+    "labels": 1
+  },
+  {
+    "title": "Bump jinja2 from 2.10 to 2.11.3 in /docs",
+    "number": 2289,
+    "labels": 1
+  },
+  {
+    "title": "Debugging help through showing pipeline intermediates. ",
+    "number": 2206,
+    "labels": 1
+  }
+]
+

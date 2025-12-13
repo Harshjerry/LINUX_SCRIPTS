@@ -1,0 +1,50 @@
+
+
+TRIED EXAMPLE  1:
+admin@i-00af238f258a599de:~$ cat  aws-volumes.json |jq '.Volumes[0]'
+{
+  "AvailabilityZoneId": "use2-az1",
+  "Iops": 1000,
+  "VolumeType": "io1",
+  "MultiAttachEnabled": false,
+  "Throughput": 250,
+  "Operator": {
+    "Managed": false
+  },
+  "VolumeId": "vol-c037761d6f9b4c7cb",
+  "Size": 8,
+  "SnapshotId": "snap-9110dc1676d545dbb",
+  "AvailabilityZone": "us-east-2c",
+  "State": "available",
+  "CreateTime": "2025-11-17T04:16:18.004823Z",
+  "Attachments": [],
+  "Encrypted": true
+}
+
+
+
+SOLUTION: 
+
+cat aws-volumes.json |
+jq -r '
+  .Volumes
+  | map({
+      vol: .VolumeType,
+      size: .Size,
+      iops: .Iops,
+      thro: .Throughput,
+      time: .CreateTime,
+      instance: .Attachments[0].InstanceId
+    })
+  | map(
+      select(
+        .vol == "gp3"
+        and .size < 64
+        and .iops < 1500
+        and .thro > 300
+        and .time < "2025-10-01T00:00:00Z"
+        and .instance != null
+      )
+    )
+  | .[0].instance
+'

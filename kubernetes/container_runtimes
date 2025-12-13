@@ -1,0 +1,68 @@
+Scheduler assigns pod
+        ↓
+API server stores pod
+        ↓
+kubelet sees pod assigned to node
+        ↓
+CNI: setup pod network, assign IP
+        ↓
+CRI: create and run containers
+        ↓
+CSI: mount volumes if needed
+        ↓
+kube-proxy: configure service load balancing
+
+
+
+⭐ CRI = run containers
+containerd, CRI-O
+kubelet → CRI API → runtime
+Handles images + containers
+
+⭐ CNI = network for pods
+Calico, Flannel, Cilium, Weave
+Assigns Pod IP
+Creates routes
+Enforces NetworkPolicies
+
+⭐ CSI = storage for pods
+AWS EBS CSI, GCE PD CSI, Ceph RBD
+Dynamic provisioning
+PV and PVC
+
+⭐ kube-proxy = service networking
+Implements ClusterIP, NodePort, LoadBalancer
+Uses iptbles or IPVS
+Load-balances traffic across Pods
+
+
+| Feature                     | CNI                | kube-proxy |
+| --------------------------- | ------------------ | ---------- |
+| Assign Pod IPs              | ✔                  | ❌          |
+| Configure pod routing       | ✔                  | ❌          |
+| Enforce NetworkPolicies     | ✔ (Calico, Cilium) | ❌          |
+| Service routing (ClusterIP) | ❌                  | ✔          |
+| NodePort rules              | ❌                  | ✔          |
+| Load-balancing to pods      | ❌                  | ✔          |
+| Use iptables/IPVS           | ❌                  | ✔          |
+
+
+
+
+🟦 REAL EXAMPLE: Pod-to-Pod Traffic
+Pod A (192.168.1.10)  →  Pod B (192.168.1.15)
+CNI does all the work:
+assigns IPs
+configures routes
+ensures connectivity
+kube-proxy is NOT involved.
+
+🟥 REAL EXAMPLE: Service-to-Pod Traffic (ClusterIP)
+curl my-service
+This uses:
+1️⃣ DNS → CoreDNS
+2️⃣ kube-proxy → iptables/IPVS rules
+3️⃣ Actual packet → Sent to backend pod
+
+Flow:
+DNS → kube-proxy rules → Pod IP

@@ -37,7 +37,7 @@ On Windows/macOS → Docker Desktop runs a lightweight Linux VM under the hood.
 
  
 
-  use of DOCKER COMPOSE  (  FOR  MERN  APP )
+use of DOCKER COMPOSE  (  FOR  MERN  APP )
   
 version: "3.9"
 services:
@@ -65,7 +65,7 @@ networks:
   app_network:
     driver: bridge
 
-//each  frontned and backned will have theri docker files and .env  files 
+//   frontned and backned will have theri docker files and .env  files 
 project/
 ├── backend/
 │   ├── Dockerfile
@@ -116,3 +116,5 @@ Fast static file serving (optimized for caching/compression)
 Proper routing (e.g., react-router refresh won’t 404)
 No Node overhead (lighter container, faster startup)
 Production readiness — same as real-world deploymet
+
+
