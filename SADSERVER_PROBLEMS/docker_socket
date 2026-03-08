@@ -1,0 +1,233 @@
+# Docker Socket Access (docker.sock) – Explanation
+
+# 2. Docker Architecture
+
+Docker works using a **client–server architecture**.
+
+```
+Docker CLI (docker command)
+        │
+        │ request
+        ▼
+Docker Socket (/var/run/docker.sock)
+        │
+        ▼
+Docker Daemon (dockerd)
+        │
+        ▼
+Creates containers/images/networks
+```
+
+Components:
+
+### Docker CLI
+
+The command-line interface used by users.
+
+Example:
+
+```
+docker ps
+docker images
+docker run nginx
+```
+
+### Docker Daemon (dockerd)
+
+The background service running on the host machine that:
+
+* builds images
+* runs containers
+* manages networks
+* manages volumes
+
+### Docker Socket
+
+A **Unix domain socket file** used for communication between the Docker CLI and the Docker daemon.
+
+Location:
+
+```
+/var/run/docker.sock
+```
+
+This file acts as a **communication channel**.
+
+---
+
+# 3. What is docker.sock?
+
+`docker.sock` is a **Unix socket file** that allows programs to communicate with the Docker daemon.
+
+Check it on a system:
+
+```
+ls -l /var/run/docker.sock
+```
+
+Example output:
+
+```
+srw-rw---- 1 root docker 0 Mar 7 docker.sock
+```
+
+The **s** indicates it is a **socket file**.
+
+Flow:
+
+```
+docker CLI
+    │
+    ▼
+docker.sock
+    │
+    ▼
+Docker daemon
+```
+
+---
+
+# 4. Mounting docker.sock into a Container
+
+Sometimes a container needs to control Docker on the host.
+
+This is done by **mounting the Docker socket**.
+
+Example:
+
+```
+docker run -d \
+--name docker-access \
+-v /var/run/docker.sock:/var/run/docker.sock \
+docker-access
+```
+
+Mapping:
+
+```
+HOST
+--------------------------------
+/var/run/docker.sock
+        │
+        │ mounted
+        ▼
+
+CONTAINER
+--------------------------------
+/var/run/docker.sock
+```
+
+Now the container can run:
+
+```
+docker ps
+docker images
+docker run nginx
+```
+
+But these commands are actually executed by the **host Docker daemon**.
+
+---
+
+# 5. Why CI/CD Containers Use docker.sock
+
+In CI/CD systems like:
+
+* Jenkins
+* GitLab CI
+* GitHub Actions
+* Build agents
+
+The CI tool often runs **inside a container**.
+
+Example architecture:
+
+```
+Host Machine
+--------------------------------
+Docker Daemon (dockerd)
+        │
+        ▼
+/var/run/docker.sock
+        │
+        │ mounted
+        ▼
+
+Jenkins Container
+--------------------------------
+Jenkins pipeline runs:
+docker build
+docker push
+docker run
+```
+
+Example Jenkins pipeline step:
+
+```
+docker build -t myapp .
+docker push myrepo/myapp
+```
+
+The Jenkins container sends the request through **docker.sock**, and the **host Docker daemon performs the action**.
+
+---
+
+# 6. Docker-outside-of-Docker (DooD)
+
+This method is called:
+
+**Docker Outside of Docker**
+
+Meaning:
+
+* Docker daemon runs on the host
+* Containers communicate with it via docker.sock
+
+Advantages:
+
+* Faster than Docker-in-Docker
+* Less resource usage
+* Common in CI/CD systems
+
+---
+
+# 7. Security Warning
+
+Giving a container access to:
+
+```
+/var/run/docker.sock
+```
+
+is very powerful.
+
+It allows the container to:
+
+* start containers
+* mount host filesystem
+* control Docker
+
+In practice this means:
+
+```
+docker.sock access ≈ root access to the host
+```
+
+Therefore it should be used carefully.
+
+---
+
+# 8. Summary
+
+Docker components:
+
+```
+Docker CLI → docker.sock → Docker daemon
+```
+
+Key ideas:
+
+* Docker CLI sends commands
+* docker.sock is the communication channel
+* Docker daemon performs the operations
+* CI/CD containers use docker.sock to control the host Docker engine
