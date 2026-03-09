@@ -1,0 +1,88 @@
+start in layers  for webserver troubleshooting
+
+Client
+ ↓
+DNS
+ ↓
+Network / Firewall
+ ↓
+Port listening
+ ↓
+Web server (Nginx / Caddy / Apache)
+ ↓
+Reverse proxy
+ ↓
+Backend application
+ ↓
+Database / dependencies
+
+
+Step 1 — Check if the service is listening
+First question:
+Is anything listening on the port?
+ss -tulnp
+
+Step 2 — Check the web server itself
+
+Verify the service.
+systemctl status nginx
+systemctl status apache2
+systemctl status caddy
+
+Step 4 — Check firewall rules
+
+
+Many problems come from firewall.
+Check:
+iptables -L -n
+
+
+Step 5 — Check reverse proxy configuration
+Many modern setups use:
+Caddy
+Nginx
+Traefik
+
+They often proxy to another service.
+Example from your case:
+Caddy :80
+↓
+reverse_proxy localhost:5050
+So test the backend directly:
+curl localhost:5050
+
+Step 7 — Check dependencies
+
+Many apps depend on:
+database
+Redis
+external APIs
+
+Backend → PostgreSQL
+So check DB:
+pg_lsclusters
+systemctl status postgresql
+
+Step 8 — Check port mismatches
+
+A very common issue.
+Example:
+App expects 5433
+DB running on 5432
+
+This caused your issue.
+Fix via:
+config change
+port fowarding
+service reconfiguration
+
+tep 9 — Check network flow
+
+Sometimes use:
+
+
+curl -v http://127.0.0.1
+This shows:
+connection
+headers
+errors
