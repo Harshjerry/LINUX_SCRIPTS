@@ -1,8 +1,11 @@
 
-if you are collaborator,
+## if you are collaborator,
 clone repo into your local machine ,make new bracnch and work on it  push on it ,and create pull requests for owner  to merge 
 
-###Why Fork?
+## for owner 
+you can   gie  write , read , admin  access to collborator ,   further  you can have branching rules to avoid merge by  developers and only you can merge pull requests
+
+## Why Fork?
 Suppose original repo is:
 testprodjerry/Test_production
 You are using account B:
@@ -11,7 +14,66 @@ If you are NOT collaborator, then:
 you cannot push branches
 cannot create branches on original repo
 cannot push to main
-
 So GitHub gives another workflow:
-
 Original Repo → Fork into your account → Work there → Raise PR back
+
+
+Core Definitions
+# Origin: 
+This is the default name Git gives to the repository you cloned. If you forked a project, origin points to your copy of the code on the server where you have "push" access.
+# Upstream:
+ This is a conventional name for the original repository you forked from. It is used to "fetch" the latest changes from the official project to keep your local work in sync.
+
+ Fork a project on GitHub to create your own copy.Clone your fork locally: git clone <your-fork-url>. This automatically sets your fork as origin.Add Upstream to stay updated with the original project:git remote add upstream <original-repo-url>Sync your local code by fetching from the official source:git fetch upstreamPush your work to your own fork:git push origin feature-branch
+
+
+
+# flow 
+ fork main (clean)
+      ↓
+create feature branch
+      ↓
+work there
+      ↓
+push feature branch
+      ↓
+PR to upstream main
+      ↓
+owner merges
+      ↓
+sync your fork main later
+
+
+# Real Open Source Workflow
+sync main
+   ↓
+create fresh branch     # everytime you want to make  new feature changes
+   ↓
+work
+   ↓
+push
+   ↓
+PR
+   ↓
+merge
+   ↓
+delete branch
+   ↓
+repeat
+
+# issues in github
+
+Instead of saying:
+"Hey fix this bug"
+
+teams create an Issue.
+Example:
+Title: Login API failing on invalid token
+Inside issue:
+bug description
+screenshots
+logs
+expected behavior
+assigned developer
+
+
