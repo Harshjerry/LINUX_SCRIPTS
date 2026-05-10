@@ -1,0 +1,17 @@
+
+if you are collaborator,
+clone repo into your local machine ,make new bracnch and work on it  push on it ,and create pull requests for owner  to merge 
+
+###Why Fork?
+Suppose original repo is:
+testprodjerry/Test_production
+You are using account B:
+devjerry04
+If you are NOT collaborator, then:
+you cannot push branches
+cannot create branches on original repo
+cannot push to main
+
+So GitHub gives another workflow:
+
+Original Repo → Fork into your account → Work there → Raise PR back

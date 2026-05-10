@@ -1,0 +1,65 @@
+
+
+hp@LAPTOP-1JTJUU8J MINGW64 /
+$ ls ~/.ssh
+config  id_ed25519  id_ed25519.pub  id_ed25519_newgithub  id_ed25519_newgithub.pub  known_hosts  known_hosts.old  sadkey
+
+hp@LAPTOP-1JTJUU8J MINGW64 /
+$ cat ~/.ssh/config
+Host *
+    ServerAliveInterval 30
+    ServerAliveCountMax 5
+
+# Old GitHub account
+Host github-prod
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519
+
+# New GitHub account
+Host github-work
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519_newgithub
+
+
+
+
+## setup remote branch for local folder
+Check current remote:
+git remote -v
+Change remote:
+git remote set-url origin git@github-prod:USERNAME/repo.git
+or:
+git remote set-url origin git@github-work:USERNAME/repo.git
+
+
+
+### git config → commit identity
+This controls:
+Author: Harshdeep Singh <mail@gmail.com>
+visible on GitHub commits.
+
+Check current values:
+git config user.name
+git config user.email
+
+Global config
+
+Set once for ALL repos:
+git config --global user.name "Harshdeep Singh"
+git config --global user.email "personal@gmail.com"
+Stored in:
+~/.gitconfig
+
+
+Local config (per repo)
+
+Inside repo:
+git config user.name "Harshdeep Singh"
+git config user.email "work@gmail.com"
+This ONLY affects that repo.
+Stored in:
+repo/.git/config
+
+
