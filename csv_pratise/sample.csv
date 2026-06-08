@@ -1,0 +1,11 @@
+hostname,environment,cpu_usage,memory_usage,disk_usage,status,region,uptime_days
+web-01,prod,82,76,65,running,us-east-1,120
+web-02,prod,91,88,92,running,us-east-1,45
+web-03,prod,35,40,30,stopped,us-west-2,200
+api-01,staging,65,55,45,running,eu-west-1,20
+api-02,staging,78,72,60,running,eu-west-1,15
+db-01,prod,95,90,85,running,us-east-1,400
+db-02,prod,45,50,40,running,us-west-2,350
+cache-01,prod,60,70,75,running,ap-south-1,100
+cache-02,dev,20,30,25,stopped,ap-south-1,5
+jenkins-01,dev,55,65,70,running,ap-south-1,50
