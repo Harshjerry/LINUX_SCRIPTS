@@ -1,0 +1,52 @@
+[
+    {
+        "hostname": "web-01",
+        "environment": "prod",
+        "cpu_usage": 82,
+        "memory_usage": 76,
+        "disk_usage": 65,
+        "status": "running",
+        "region": "us-east-1",
+        "uptime_days": 120
+    },
+    {
+        "hostname": "web-02",
+        "environment": "prod",
+        "cpu_usage": 91,
+        "memory_usage": 88,
+        "disk_usage": 92,
+        "status": "running",
+        "region": "us-east-1",
+        "uptime_days": 45
+    },
+    {
+        "hostname": "web-03",
+        "environment": "prod",
+        "cpu_usage": 35,
+        "memory_usage": 40,
+        "disk_usage": 30,
+        "status": "stopped",
+        "region": "us-west-2",
+        "uptime_days": 200
+    },
+    {
+        "hostname": "api-01",
+        "environment": "staging",
+        "cpu_usage": 65,
+        "memory_usage": 55,
+        "disk_usage": 45,
+        "status": "running",
+        "region": "eu-west-1",
+        "uptime_days": 20
+    },
+    {
+        "hostname": "db-01",
+        "environment": "prod",
+        "cpu_usage": 95,
+        "memory_usage": 90,
+        "disk_usage": 85,
+        "status": "running",
+        "region": "us-east-1",
+        "uptime_days": 400
+    }
+]
